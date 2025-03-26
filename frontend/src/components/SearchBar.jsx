@@ -6,7 +6,7 @@ export default function SearchBar() {
         type="search"
         name="search-todo"
         id="search-todo"
-        placeholder="Nom de la tâche"
+        placeholder="Chercher..."
       />
       <button>O</button>
     </form>
