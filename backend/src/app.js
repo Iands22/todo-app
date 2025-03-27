@@ -1,10 +1,17 @@
+require('dotenv').config()
 const express = require('express')
-const { PrismaClient } = require('@prisma/client')
+const errorHandler = require('./middlewares/errorHandler')
+const todoRouter = require('./routes/todoRoutes')
 
 const app = express()
 
 app.use(express.json())
-const PORT = 8000
-app.listen(PORT, () => {
-    console.log(`Serveur démarré sur le port ${PORT}`)
+
+app.use('/', todoRouter)
+
+app.use(errorHandler)
+
+const port = process.env.PORT || 8000
+app.listen(port, () => {
+    console.log(`Serveur démarré sur le port ${port}`)
 })
