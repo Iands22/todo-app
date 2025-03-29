@@ -53,7 +53,7 @@ exports.deleteTodo = async (req, res, next) => {
       await prisma.todo.delete({
         where: { todoId: Number(id) },
       });
-      return res.status(204);
+      return res.status(200).json({ message: "Task deleted" });
     }
   } catch (error) {
     next(error);
@@ -73,11 +73,11 @@ exports.updateTodo = async (req, res, next) => {
   }
   const { todoName, isDone } = req.body;
   try {
-    const todo = await prisma.todo.update({
+    const updatedTodo = await prisma.todo.update({
       where: { todoId: Number(id) },
       data: { todoName, isDone },
     });
-    res.status(200).json({ message: "Task updated successfuly" });
+    res.status(200).json(updatedTodo);
   } catch (error) {
     next(error);
   }
