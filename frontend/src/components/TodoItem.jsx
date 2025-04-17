@@ -1,35 +1,68 @@
 import { useState } from "react";
 import UpdateTodoModal from "./UpdateTodoModal";
+import { useTodos } from "../context/TodoContext";
+import { TrashIcon } from "@heroicons/react/24/solid";
+import ModalConfirmation from "./ModalConfirmation";
 
 export default function TodoItem({ todo }) {
-  const [todoState, setTodoState] = useState(todo.todoState);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenModalUpdate, setIsOpenModalUpdate] = useState(false);
+  const [isOpenModalDelete, setIsOpenModalDelete] = useState(false);
+  const { deleteTodo, updateTodo } = useTodos();
 
-  function handleChange() {
-    setTodoState(!todoState);
+  const todoNameStyle = todo.isDone ? "text-sm line-through" : "";
+  const iconDeleteStyle = todo.isDone
+    ? "mx-1 size-5 text-gray-700"
+    : "mx-1 size-6 text-red-700";
+
+  async function setTodoDone() {
+    const updatedData = {
+      todoName: todo.todoName,
+      isDone: !todo.isDone,
+    };
+    await updateTodo(todo.todoId, updatedData);
   }
 
-  function handleClick(e) {
+  async function handleDelete() {
+    await deleteTodo(todo.todoId)
+  }
+  function openModalConfirmation(e) {
     e.stopPropagation();
-    console.log(`${todo.todoName} ${todo.todoState}`);
+    setIsOpenModalDelete(true)
   }
-
 
   return (
     <>
-      <li onClick={() => setIsOpen(true)}>
-        <span>{todo.todoName}</span>
-        <input
-          type="checkbox"
-          name="check-todo"
-          id="check-todo"
-          onChange={(e) => handleChange(e)}
-          checked={todoState}
-          onClick={(e) => e.stopPropagation()}
-        />
-        <button onClick={(e) => handleClick(e)}>Supprimer</button>
+      <li className="todo-style" onClick={() => setIsOpenModalUpdate(true)}>
+        <span className={todoNameStyle}>{todo.todoName}</span>
+        <div className="flex items-center">
+          {!todo.isDone ? (
+            <input
+              type="checkbox"
+              name="check-todo"
+              id="check-todo"
+              className="size-5"
+              onChange={() => setTodoDone()}
+              checked={todo.isDone}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <span></span>
+          )}
+          <button className="ml-3" onClick={(e) => openModalConfirmation(e)}>
+            <TrashIcon className={iconDeleteStyle} />
+          </button>
+        </div>
       </li>
-      <UpdateTodoModal isOpen={isOpen} setIsOpen={setIsOpen} todo={todo} />
+      <UpdateTodoModal
+        isOpen={isOpenModalUpdate}
+        setIsOpen={setIsOpenModalUpdate}
+        todo={todo}
+      />
+      <ModalConfirmation
+        isOpen={isOpenModalDelete}
+        setIsOpen={setIsOpenModalDelete}
+        deleteTodo={handleDelete}
+      />
     </>
   );
 }
